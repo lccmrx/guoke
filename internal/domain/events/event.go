@@ -18,6 +18,10 @@ const (
 	ClientUserinfoChanged EventName = "ClientUserinfoChanged"
 )
 
+var (
+	reEvent = regexp.MustCompile(`(?P<stopwatch>\d+:\d+) (?:-{60}|(?P<event>\w+): ?(?P<data>.*))`)
+)
+
 type EventName string
 
 type Event struct {
@@ -33,8 +37,9 @@ var eventHandlerMap = map[EventName]EventHandler{
 	ShutdownGame:          HandleShutdownEvent,
 	ClientConnect:         HandleClientConnectEvent,
 	ClientUserinfoChanged: HandleClientInfoChangedEvent,
+	Kill:                  HandleKillEvent,
 	// ClientDisconnect:      HandleClientDisconnectEvent,
-	Kill: HandleKillEvent,
+	// removed due to unkwnown game rule for handling the score when a user disconnects
 }
 
 func Handle(server *server.ServerState, event Event) error {
@@ -52,11 +57,10 @@ func Events(data []byte) iter.Seq2[int, Event] {
 		for len(data) > 0 {
 			line, rest, _ := bytes.Cut(data, []byte{'\n'})
 
-			re := regexp.MustCompile(`(?P<stopwatch>\d+:\d+) (?:-{60}|(?P<event>\w+): ?(?P<data>.*))`)
-			matches := re.FindStringSubmatch(string(line))
-			stopawatch := string(matches[re.SubexpIndex("stopwatch")])
-			eventName := EventName(matches[re.SubexpIndex("event")])
-			eventData := string(matches[re.SubexpIndex("data")])
+			matches := reEvent.FindStringSubmatch(string(line))
+			stopawatch := string(matches[reEvent.SubexpIndex("stopwatch")])
+			eventName := EventName(matches[reEvent.SubexpIndex("event")])
+			eventData := string(matches[reEvent.SubexpIndex("data")])
 
 			event := Event{
 				Stopwatch: stopawatch,

@@ -37,3 +37,10 @@ or go with a (to run in a productive mode):
 go build -C cmd . -o guoke
 ./guoke <logpath>
 ```
+
+## Roadmap
+
+- [ ] Chunk-based reading
+> This will allow to rapidly paralelize the processing for the log events
+- [ ] io.Reader events
+> This will allow the server to connect to many log event sources, which could be the stdout of the gamer server

@@ -6,12 +6,15 @@ import (
 	"github.com/lccmrx/cwt/internal/domain/server"
 )
 
+var (
+	reClientDisconnectEvent = regexp.MustCompile(`(?P<playerid>\d+)`)
+)
+
 type ClientDisconnectEvent Event
 
 func (event *ClientDisconnectEvent) Participant() string {
-	re := regexp.MustCompile(`(?P<playerid>\d+)`)
-	matches := re.FindStringSubmatch(string(event.Data))
-	playerId := string(matches[re.SubexpIndex("playerid")])
+	matches := reClientDisconnectEvent.FindStringSubmatch(string(event.Data))
+	playerId := string(matches[reClientDisconnectEvent.SubexpIndex("playerid")])
 
 	return playerId
 }

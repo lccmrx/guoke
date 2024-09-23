@@ -9,14 +9,17 @@ import (
 	"github.com/lccmrx/cwt/internal/domain/server"
 )
 
+var (
+	reKillEvent = regexp.MustCompile(`(?P<killer>\d+) (?P<killed>\d+) (?P<mean>\d+)`)
+)
+
 type KillEvent Event
 
 func (event *KillEvent) Participants() (string, string, string) {
-	re := regexp.MustCompile(`(?P<killer>\d+) (?P<killed>\d+) (?P<mean>\d+)`)
-	matches := re.FindStringSubmatch(string(event.Data))
-	killerId := string(matches[re.SubexpIndex("killer")])
-	killedId := string(matches[re.SubexpIndex("killed")])
-	meanId := string(matches[re.SubexpIndex("mean")])
+	matches := reKillEvent.FindStringSubmatch(string(event.Data))
+	killerId := string(matches[reKillEvent.SubexpIndex("killer")])
+	killedId := string(matches[reKillEvent.SubexpIndex("killed")])
+	meanId := string(matches[reKillEvent.SubexpIndex("mean")])
 
 	return killerId, killedId, meanId
 }

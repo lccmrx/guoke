@@ -6,13 +6,16 @@ import (
 	"github.com/lccmrx/cwt/internal/domain/server"
 )
 
+var (
+	reClientInfoChangedEvent = regexp.MustCompile(`(?P<playerid>\d+) n\\(?P<playername>[^\\]+)\\t`)
+)
+
 type ClientUserinfoChangedEvent Event
 
 func (event *ClientUserinfoChangedEvent) Participant() (string, string) {
-	re := regexp.MustCompile(`(?P<playerid>\d+) n\\(?P<playername>[^\\]+)\\t`)
-	matches := re.FindStringSubmatch(string(event.Data))
-	playerId := string(matches[re.SubexpIndex("playerid")])
-	playerName := string(matches[re.SubexpIndex("playername")])
+	matches := reClientInfoChangedEvent.FindStringSubmatch(string(event.Data))
+	playerId := string(matches[reClientInfoChangedEvent.SubexpIndex("playerid")])
+	playerName := string(matches[reClientInfoChangedEvent.SubexpIndex("playername")])
 
 	return playerId, playerName
 }
